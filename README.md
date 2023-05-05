@@ -1,2 +1,2 @@
 # falcon-amazon-java-users
-An Amazon clone using the Spring Boot Framework for the backend and Angular for the frontend
+A Microservice CRUD API to manage the user domain of a Spring Boot Amazon clone.
