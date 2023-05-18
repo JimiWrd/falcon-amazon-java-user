@@ -11,21 +11,12 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DateUtilsTest {
-    private String dateOfBirth;
 
     @Test
     void converted_dateOfBirth_matches_correct_LocalDateTime_format() {
-        LocalDateTime expectedDate = LocalDateTime.of(1994, 4, 2, 0, 0, 0);
-        dateOfBirth = "1994-04-02T00:00:00";
+        LocalDate expectedDate = LocalDate.of(1994, 4, 2);
+        String dateOfBirth = "1994-04-02";
 
         assertEquals(expectedDate, DateUtils.dateOfBirthFormatter(dateOfBirth));
     }
-
-    @Test
-    void dateOfBirth_time_always_set_to_midnight() {
-        dateOfBirth = "1994-04-02T02:03:04";
-
-        assertEquals("1994-04-02T00:00", DateUtils.dateOfBirthFormatter(dateOfBirth).toString());
-    }
-
 }

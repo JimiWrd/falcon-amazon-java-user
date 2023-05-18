@@ -7,7 +7,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class CreateUserDto {
+public class UpdateUserDto {
     @NotNull(message = "Forename cannot be empty")
     private String forenames;
     @NotNull(message = "Surname cannot be empty")
