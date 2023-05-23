@@ -1,7 +1,9 @@
 package com.jumar.user.services.impl;
 
 import com.jumar.user.dto.CreateUserDto;
-import com.jumar.user.exceptions.OneOrMoreUserRequiredFieldsNullException;
+import com.jumar.user.dto.UpdateUserDto;
+import com.jumar.user.exceptions.UserNotFoundException;
+import com.jumar.user.exceptions.UsernameAlreadyExistsException;
 import com.jumar.user.models.User;
 import com.jumar.user.repository.AddressRepository;
 import com.jumar.user.repository.UserRepository;
@@ -12,10 +14,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -26,34 +32,27 @@ class UserServiceImplTest {
     AddressRepository addressRepository;
 
     private UserService userService;
-    private CreateUserDto createUserDtoTest;
-    private User userTest;
+    private CreateUserDto createUserDto;
+    private User testUser;
     private User createdUser;
 
     @BeforeEach
     void setup() {
         userService = new UserServiceImpl(userRepository, addressRepository);
         createTestDto();
-        userTest = createTestUser();
-        createdUser = userService.createUser(createUserDtoTest);
+        testUser = createTestUser();
+        createdUser = userService.createUser(createUserDto);
     }
 
     @Test
     void should_returnTrue_when_comparingReturnedUser_to_TestUser(){
 
-        assertThat(userTest).usingRecursiveComparison().ignoringFields("id",
+        assertThat(testUser).usingRecursiveComparison().ignoringFields("id",
                 "username",
                 "dateAdded",
                 "dateLastModified",
                 "failedLoginAttempts",
-                "isDeleted").isEqualTo(userService.createUser(createUserDtoTest));
-    }
-
-    @Test
-    void should_throwException_when_anyFields_areNull(){
-        assertThatThrownBy(() -> {
-            userService.createUser(new CreateUserDto());
-        }).isInstanceOf(OneOrMoreUserRequiredFieldsNullException.class).hasMessageContaining("One or more fields were empty.");
+                "isDeleted").isEqualTo(userService.createUser(createUserDto));
     }
 
     @Test
@@ -83,21 +82,61 @@ class UserServiceImplTest {
     }
 
     @Test
-    void should_returnFalse_when_comparing_plaintextPassword_to_hashedPasswordProperty() {
+    void should_returnTrue_when_comparing_plaintextPassword_to_hashedPasswordProperty() {
         String plaintextPass = "plaintext";
-        createUserDtoTest.setPasswordHash(plaintextPass);
-        User passwordTest = userService.createUser(createUserDtoTest);
+        createUserDto.setPasswordHash(plaintextPass);
+        User passwordTest = userService.createUser(createUserDto);
         assertThat(passwordTest).extracting("passwordHash").isNotEqualTo(plaintextPass);
     }
+
+    @Test
+    void should_throwException_ifUsernameAlreadyExists(){
+        when(userRepository.existsByUsername("testEmail@email.com")).thenReturn(true);
+        assertThatThrownBy(() -> userService.createUser(createUserDto)).isInstanceOf(UsernameAlreadyExistsException.class);
+    }
+
+    @Test
+    void should_returnTrue_when_comparingReturnedUpdatedUser_with_testUser() {
+        ModelMapper mapper = new ModelMapper();
+        UpdateUserDto updateUserDto = mapper.map(createUserDto, UpdateUserDto.class);
+        when(userRepository.findById(1)).thenReturn(Optional.ofNullable(testUser));
+        assertThat(testUser).usingRecursiveComparison().ignoringFields(
+                "dateLastModified").isEqualTo(userService.updateUser(updateUserDto, 1));
+    }
+
+    @Test
+    void should_returnFalse_when_comparingDateLastModified_of_updateUserDto_to_userTest()
+    {
+        ModelMapper mapper = new ModelMapper();
+        UpdateUserDto updateUserDto = mapper.map(createUserDto, UpdateUserDto.class);
+        when(userRepository.findById(1)).thenReturn(Optional.ofNullable(testUser));
+        assertThat(testUser.getDateLastModified()).isNotEqualTo(userService.updateUser(updateUserDto, 1).getDateLastModified());
+    }
+
+    @Test
+    void should_returnFalse_whenComparing_OriginalUserFromRepo_to_updatedUserDto() {
+        ModelMapper mapper = new ModelMapper();
+        UpdateUserDto updateUserDto = mapper.map(createUserDto, UpdateUserDto.class);
+        updateUserDto.setSurname("change");
+        updateUserDto.setTelephone("1234");
+        when(userRepository.findById(1)).thenReturn(Optional.ofNullable(testUser));
+        assertThat(testUser).isNotEqualTo(userService.updateUser(updateUserDto, 1));
+    }
+
+    @Test
+    void should_throwException_when_deleteUserThatDoesNotExist() {
+        assertThatThrownBy(() -> userService.deleteUser(1)).isInstanceOf(UserNotFoundException.class);
+    }
+
     private void createTestDto() {
-        createUserDtoTest = new CreateUserDto();
-        createUserDtoTest.setFirstName("firstName");
-        createUserDtoTest.setLastName("lastName");
-        createUserDtoTest.setEmailAddress("testEmail@email.com");
-        createUserDtoTest.setTelephone("0121123456");
-        createUserDtoTest.setDateOfBirth(LocalDateTime.of(1994, 4, 2, 0, 0));
+        createUserDto = new CreateUserDto();
+        createUserDto.setForenames("firstName");
+        createUserDto.setSurname("lastName");
+        createUserDto.setEmailAddress("testEmail@email.com");
+        createUserDto.setTelephone("0121123456");
+        createUserDto.setDateOfBirth(LocalDate.of(1994, 4, 2));
         try {
-            createUserDtoTest.setPasswordHash("test");
+            createUserDto.setPasswordHash("test");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -106,11 +145,11 @@ class UserServiceImplTest {
     private User createTestUser() {
         User userTestReturn = new User();
         userTestReturn.setId(1);
-        userTestReturn.setFirstName("firstName");
-        userTestReturn.setLastName("lastName");
+        userTestReturn.setForenames("firstName");
+        userTestReturn.setSurname("lastName");
         userTestReturn.setEmailAddress("testEmail@email.com");
         userTestReturn.setTelephone("0121123456");
-        userTestReturn.setDateOfBirth(LocalDateTime.of(1994, 4, 2, 0, 0));
+        userTestReturn.setDateOfBirth(LocalDate.of(1994, 4, 2));
         userTestReturn.setUsername("testEmail@email.com");
         try {
             userTestReturn.setPasswordHash(PasswordUtils.hashPassword("test"));
