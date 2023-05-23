@@ -2,10 +2,12 @@ package com.jumar.user.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 
+@Builder
 @Data
 public class CreateUserDto {
     @NotNull(message = "Forename cannot be empty")

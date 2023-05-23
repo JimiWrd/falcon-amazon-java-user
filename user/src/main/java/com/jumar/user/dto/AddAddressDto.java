@@ -2,8 +2,10 @@ package com.jumar.user.dto;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 
+@Builder
 @Data
 public class AddAddressDto {
     @NotNull(message = "House Name/Number cannot be empty.")
