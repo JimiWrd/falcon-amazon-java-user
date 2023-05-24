@@ -2,11 +2,15 @@ package com.jumar.user.dto;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Builder
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AddAddressDto {
     @NotNull(message = "House Name/Number cannot be empty.")
     private String houseNameNumber;

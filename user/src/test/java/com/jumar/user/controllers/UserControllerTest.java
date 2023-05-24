@@ -35,7 +35,7 @@ class UserControllerTest {
 
     @BeforeEach
     void setup() {
-        generateCreateUserDto();
+       createUserDtoTest = generateCreateUserDto();
     }
 
     @SneakyThrows
@@ -67,17 +67,13 @@ class UserControllerTest {
                         .andExpect(status().isBadRequest());
     }
 
-    private void generateCreateUserDto() {
-        createUserDtoTest = new CreateUserDto();
-        createUserDtoTest.setForenames("firstName");
-        createUserDtoTest.setSurname("lastName");
-        createUserDtoTest.setEmailAddress("testEmail@email.com");
-        createUserDtoTest.setTelephone("0121123456");
-        createUserDtoTest.setDateOfBirth(LocalDate.of(1994, 4, 2));
-        try {
-            createUserDtoTest.setPasswordHash("test");
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+    private CreateUserDto generateCreateUserDto() {
+        return CreateUserDto.builder()
+                .forenames("Josh")
+                .surname("Wood")
+                .emailAddress("josh.wood@me.com")
+                .telephone("0121123456")
+                .dateOfBirth(LocalDate.of(1994, 4, 2))
+                .passwordHash("test").build();
     }
 }

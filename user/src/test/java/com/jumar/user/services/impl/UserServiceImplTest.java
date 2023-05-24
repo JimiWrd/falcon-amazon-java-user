@@ -9,6 +9,7 @@ import com.jumar.user.repository.AddressRepository;
 import com.jumar.user.repository.UserRepository;
 import com.jumar.user.services.UserService;
 import com.jumar.user.utils.PasswordUtils;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +40,7 @@ class UserServiceImplTest {
     @BeforeEach
     void setup() {
         userService = new UserServiceImpl(userRepository, addressRepository);
-        createTestDto();
+        createUserDto = createTestDto();
         testUser = createTestUser();
         createdUser = userService.createUser(createUserDto);
     }
@@ -47,12 +48,14 @@ class UserServiceImplTest {
     @Test
     void should_returnTrue_when_comparingReturnedUser_to_TestUser(){
 
+        User createdUser = userService.createUser(createUserDto);
+
         assertThat(testUser).usingRecursiveComparison().ignoringFields("id",
                 "username",
                 "dateAdded",
                 "dateLastModified",
                 "failedLoginAttempts",
-                "isDeleted").isEqualTo(userService.createUser(createUserDto));
+                "isDeleted").isEqualTo(createdUser);
     }
 
     @Test
@@ -91,7 +94,7 @@ class UserServiceImplTest {
 
     @Test
     void should_throwException_ifUsernameAlreadyExists(){
-        when(userRepository.existsByUsername("testEmail@email.com")).thenReturn(true);
+        when(userRepository.existsByUsername("josh.wood@me.com")).thenReturn(true);
         assertThatThrownBy(() -> userService.createUser(createUserDto)).isInstanceOf(UsernameAlreadyExistsException.class);
     }
 
@@ -128,40 +131,30 @@ class UserServiceImplTest {
         assertThatThrownBy(() -> userService.deleteUser(1)).isInstanceOf(UserNotFoundException.class);
     }
 
-    private void createTestDto() {
-        createUserDto = new CreateUserDto();
-        createUserDto.setForenames("firstName");
-        createUserDto.setSurname("lastName");
-        createUserDto.setEmailAddress("testEmail@email.com");
-        createUserDto.setTelephone("0121123456");
-        createUserDto.setDateOfBirth(LocalDate.of(1994, 4, 2));
-        try {
-            createUserDto.setPasswordHash("test");
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+    private CreateUserDto createTestDto() {
+        return CreateUserDto.builder()
+                .forenames("Josh")
+                .surname("Wood")
+                .emailAddress("josh.wood@me.com")
+                .telephone("0121123456")
+                .dateOfBirth(LocalDate.of(1994, 4, 2))
+                .passwordHash("test").build();
     }
 
+    @SneakyThrows
     private User createTestUser() {
-        User userTestReturn = new User();
-        userTestReturn.setId(1);
-        userTestReturn.setForenames("firstName");
-        userTestReturn.setSurname("lastName");
-        userTestReturn.setEmailAddress("testEmail@email.com");
-        userTestReturn.setTelephone("0121123456");
-        userTestReturn.setDateOfBirth(LocalDate.of(1994, 4, 2));
-        userTestReturn.setUsername("testEmail@email.com");
-        try {
-            userTestReturn.setPasswordHash(PasswordUtils.hashPassword("test"));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        userTestReturn.setDateAdded(LocalDateTime.of(2023, 5, 12, 0,0));
-        userTestReturn.setDateLastModified(LocalDateTime.of(2023, 5, 12, 0,0));
-        userTestReturn.setFailedLoginAttempts(0);
-        userTestReturn.setDeleted(false);
+        return User.builder()
+                        .id(1)
+                        .forenames("Josh").surname("Wood")
+                        .emailAddress("josh.wood@me.com").telephone("0121123456").dateOfBirth(LocalDate.of(1994, 4, 2))
+                        .username("josh.wood@me.com")
+                        .passwordHash(PasswordUtils.hashPassword("test"))
+                        .dateAdded(LocalDateTime.of(2023, 5, 12, 0,0))
+                        .dateLastModified(LocalDateTime.of(2023, 5, 12, 0,0))
+                        .failedLoginAttempts(0)
+                        .isDeleted(false)
+                        .build();
 
-        return userTestReturn;
     }
 
 
