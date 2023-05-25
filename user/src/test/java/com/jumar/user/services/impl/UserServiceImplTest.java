@@ -4,6 +4,7 @@ import com.jumar.user.dto.CreateUserDto;
 import com.jumar.user.dto.UpdateUserDto;
 import com.jumar.user.exceptions.UserNotFoundException;
 import com.jumar.user.exceptions.UsernameAlreadyExistsException;
+import com.jumar.user.fixtures.UserFixtures;
 import com.jumar.user.models.User;
 import com.jumar.user.repository.AddressRepository;
 import com.jumar.user.repository.UserRepository;
@@ -40,8 +41,8 @@ class UserServiceImplTest {
     @BeforeEach
     void setup() {
         userService = new UserServiceImpl(userRepository, addressRepository);
-        createUserDto = createTestDto();
-        testUser = createTestUser();
+        createUserDto = UserFixtures.generateCreateUserDto();
+        testUser = UserFixtures.generateValidUser();
         createdUser = userService.createUser(createUserDto);
     }
 
@@ -130,32 +131,4 @@ class UserServiceImplTest {
     void should_throwException_when_deleteUserThatDoesNotExist() {
         assertThatThrownBy(() -> userService.deleteUser(1)).isInstanceOf(UserNotFoundException.class);
     }
-
-    private CreateUserDto createTestDto() {
-        return CreateUserDto.builder()
-                .forenames("Josh")
-                .surname("Wood")
-                .emailAddress("josh.wood@me.com")
-                .telephone("0121123456")
-                .dateOfBirth(LocalDate.of(1994, 4, 2))
-                .passwordHash("test").build();
-    }
-
-    @SneakyThrows
-    private User createTestUser() {
-        return User.builder()
-                        .id(1)
-                        .forenames("Josh").surname("Wood")
-                        .emailAddress("josh.wood@me.com").telephone("0121123456").dateOfBirth(LocalDate.of(1994, 4, 2))
-                        .username("josh.wood@me.com")
-                        .passwordHash(PasswordUtils.hashPassword("test"))
-                        .dateAdded(LocalDateTime.of(2023, 5, 12, 0,0))
-                        .dateLastModified(LocalDateTime.of(2023, 5, 12, 0,0))
-                        .failedLoginAttempts(0)
-                        .isDeleted(false)
-                        .build();
-
-    }
-
-
 }
