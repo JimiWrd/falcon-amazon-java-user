@@ -10,18 +10,11 @@ public final class PasswordUtils {
     private PasswordUtils(){}
 
     public static String hashPassword(String password) throws NoSuchAlgorithmException {
-        byte[] salt = saltGenerator();
-        MessageDigest md = MessageDigest.getInstance("SHA-512");
 
-        md.update(salt);
+        MessageDigest md = MessageDigest.getInstance("SHA-512");
 
         byte [] hashBytes = md.digest(password.getBytes(StandardCharsets.UTF_8));
 
         return DatatypeConverter.printHexBinary(hashBytes).toUpperCase();
-    }
-
-    private static byte[] saltGenerator() {
-
-        return "supersecretsalt".getBytes();
     }
 }
