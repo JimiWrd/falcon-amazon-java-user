@@ -33,18 +33,28 @@ public class UserServiceImpl implements UserService {
         if(userRepository.existsByUsername(createUserDto.getEmailAddress())) {
             throw new UsernameAlreadyExistsException("This username already exists");
         }
-        ModelMapper mapper = new ModelMapper();
 
-        User newUser = mapper.map(createUserDto, User.class);
-        newUser.setDateAdded(LocalDateTime.now());
-        newUser.setDateLastModified(newUser.getDateAdded());
-        newUser.setUsername(newUser.getEmailAddress());
-        newUser.setPasswordHash(PasswordUtils.hashPassword(newUser.getPasswordHash()));
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        User newUser = User.builder()
+                .forenames(createUserDto.getForenames())
+                .surname(createUserDto.getSurname())
+                .emailAddress(createUserDto.getEmailAddress())
+                .telephone(createUserDto.getTelephone())
+                .dateOfBirth(createUserDto.getDateOfBirth())
+                .username(createUserDto.getEmailAddress())
+                .passwordHash(PasswordUtils.hashPassword(createUserDto.getPasswordHash()))
+                .dateAdded(currentTime)
+                .dateLastModified(currentTime)
+                .failedLoginAttempts(0)
+                .isDeleted(false)
+                .build();
 
         userRepository.save(newUser);
 
         return newUser;
     }
+
     @Override
     public ReadUserDto getUser(int id) throws UserNotFoundException {
         ModelMapper mapper = new ModelMapper();
@@ -56,16 +66,22 @@ public class UserServiceImpl implements UserService {
     @SneakyThrows
     @Override
     public User updateUser(UpdateUserDto updateUserDto, int id) throws UserNotFoundException {
-        ModelMapper mapper = new ModelMapper();
-
         User response = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User does not exist."));
 
-        User updateUser = mapper.map(updateUserDto, User.class);
-        updateUser.setId(response.getId());
-        updateUser.setDateAdded(response.getDateAdded());
-        updateUser.setDateLastModified(LocalDateTime.now());
-        updateUser.setUsername(updateUser.getEmailAddress());
-        updateUser.setPasswordHash(PasswordUtils.hashPassword(updateUser.getPasswordHash()));
+        User updateUser = User.builder()
+                .id(response.getId())
+                .forenames(updateUserDto.getForenames())
+                .surname(updateUserDto.getSurname())
+                .emailAddress(updateUserDto.getEmailAddress())
+                .telephone(updateUserDto.getTelephone())
+                .dateOfBirth(updateUserDto.getDateOfBirth())
+                .username(updateUserDto.getEmailAddress())
+                .passwordHash(PasswordUtils.hashPassword(updateUserDto.getPasswordHash()))
+                .dateAdded(response.getDateAdded())
+                .dateLastModified(LocalDateTime.now())
+                .failedLoginAttempts(response.getFailedLoginAttempts())
+                .isDeleted(false)
+                .build();
 
         userRepository.save(updateUser);
 

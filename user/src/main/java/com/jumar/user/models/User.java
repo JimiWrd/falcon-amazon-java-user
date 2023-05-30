@@ -1,14 +1,19 @@
 package com.jumar.user.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import lombok.Data;
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import org.hibernate.Hibernate;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Entity
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
 @Table(name = "tbl_users")
 public class User {
 
