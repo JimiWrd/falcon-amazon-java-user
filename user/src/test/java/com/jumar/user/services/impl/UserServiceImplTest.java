@@ -8,9 +8,6 @@ import com.jumar.user.fixtures.UserFixtures;
 import com.jumar.user.models.User;
 import com.jumar.user.repository.AddressRepository;
 import com.jumar.user.repository.UserRepository;
-import com.jumar.user.services.UserService;
-import com.jumar.user.utils.PasswordUtils;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,11 +16,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,7 +38,6 @@ class UserServiceImplTest {
 
     @BeforeEach
     void setup() {
-//        userService = new UserServiceImpl(userRepository, addressRepository);
         createUserDto = UserFixtures.generateCreateUserDto();
         testUser = UserFixtures.generateValidUser();
         createdUser = userService.createUser(createUserDto);
