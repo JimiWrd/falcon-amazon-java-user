@@ -14,6 +14,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
@@ -33,14 +34,15 @@ class UserServiceImplTest {
     @Mock
     AddressRepository addressRepository;
 
-    private UserService userService;
+    @InjectMocks
+    private UserServiceImpl userService;
     private CreateUserDto createUserDto;
     private User testUser;
     private User createdUser;
 
     @BeforeEach
     void setup() {
-        userService = new UserServiceImpl(userRepository, addressRepository);
+//        userService = new UserServiceImpl(userRepository, addressRepository);
         createUserDto = UserFixtures.generateCreateUserDto();
         testUser = UserFixtures.generateValidUser();
         createdUser = userService.createUser(createUserDto);
