@@ -20,7 +20,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -114,8 +116,9 @@ class UserApplicationTests {
 		mockMvc.perform(delete("/api/user/1")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(testUpdateUserDto)))
-				.andExpect(status().isNoContent());
+				.andExpect(status().isOk());
 
-		assertThat(userRepository.findById(1)).isEmpty();
+		assertThat(userRepository.findById(1).get().isDeleted()).isTrue();
 	}
+
 }

@@ -24,7 +24,7 @@ public class UserFixtures {
                 .dateAdded(LocalDateTime.now())
                 .dateLastModified(LocalDateTime.now())
                 .failedLoginAttempts(0)
-                .isDeleted(false)
+                .deleted(false)
                 .build();
     }
 

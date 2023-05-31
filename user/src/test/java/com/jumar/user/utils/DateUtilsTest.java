@@ -1,14 +1,10 @@
 package com.jumar.user.utils;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.sql.Date;
-import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DateUtilsTest {
 

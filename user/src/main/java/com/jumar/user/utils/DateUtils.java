@@ -1,7 +1,6 @@
 package com.jumar.user.utils;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public final class DateUtils {
     private DateUtils() {}
@@ -10,4 +9,5 @@ public final class DateUtils {
 
         return LocalDate.parse(dateOfBirth);
     }
+
 }
