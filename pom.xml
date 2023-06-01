@@ -93,23 +93,6 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<profiles>
-						<profile>
-							<id>test</id>
-							<activation>
-								<activeByDefault>true</activeByDefault>
-							</activation>
-							<properties>
-								<spring.profiles.active>test</spring.profiles.active>
-							</properties>
-						</profile>
-						<profile>
-							<id>local</id>
-							<properties>
-								<spring.profiles.active>local</spring.profiles.active>
-							</properties>
-						</profile>
-					</profiles>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>

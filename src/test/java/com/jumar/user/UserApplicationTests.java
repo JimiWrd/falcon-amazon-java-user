@@ -20,7 +20,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -60,8 +62,8 @@ class UserApplicationTests {
 	@Test
 	void should_returnCorrectString_when_createUser() {
 		MvcResult result = mockMvc.perform(post("/api/user/create")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(testCreateUserDto)))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(testCreateUserDto)))
 				.andReturn();
 
 		String resultMessage = result.getResponse().getContentAsString();
@@ -73,8 +75,8 @@ class UserApplicationTests {
 	@Test
 	void should_containUser_in_database_when_createUser() {
 		mockMvc.perform(post("/api/user/create")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(testCreateUserDto)))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(testCreateUserDto)))
 				.andExpect(status().isCreated());
 
 		User result = userRepository.findById(1).orElseThrow();
@@ -94,8 +96,8 @@ class UserApplicationTests {
 		User original = userRepository.findById(1).orElseThrow();
 
 		mockMvc.perform(put("/api/user/1")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(testUpdateUserDto)))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(testUpdateUserDto)))
 				.andExpect(status().isCreated());
 
 		User updatedUser = userRepository.findById(1).orElseThrow();
@@ -107,15 +109,16 @@ class UserApplicationTests {
 	@Test
 	void should_deleteUser_from_database_when_deleteUser() {
 		mockMvc.perform(post("/api/user/create")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(testCreateUserDto)))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(testCreateUserDto)))
 				.andExpect(status().isCreated());
 
 		mockMvc.perform(delete("/api/user/1")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(testUpdateUserDto)))
-				.andExpect(status().isNoContent());
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(testUpdateUserDto)))
+				.andExpect(status().isOk());
 
-		assertThat(userRepository.findById(1)).isEmpty();
+		assertThat(userRepository.findById(1).get().isDeleted()).isTrue();
 	}
+
 }

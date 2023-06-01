@@ -35,15 +35,15 @@ class UserControllerTest {
 
     @BeforeEach
     void setup() {
-       createUserDtoTest = UserFixtures.generateCreateUserDto();
+        createUserDtoTest = UserFixtures.generateCreateUserDto();
     }
 
     @SneakyThrows
     @Test
     void should_returnCreated_when_callingCreateUserEndpoint() {
         mockMvc.perform(post("/api/user/create")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createUserDtoTest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createUserDtoTest)))
                 .andExpect(status().isCreated());
     }
 
@@ -52,8 +52,8 @@ class UserControllerTest {
     void should_returnBadRequest_when_callingCreateUser_with_invalidEmail() {
         createUserDtoTest.setEmailAddress("gibberish");
         mockMvc.perform(post("/api/user/create")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createUserDtoTest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createUserDtoTest)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -62,8 +62,8 @@ class UserControllerTest {
     void should_returnBadRequest_when_ForenamesIsNull() {
         createUserDtoTest.setForenames(null);
         mockMvc.perform(post("/api/user/create")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createUserDtoTest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createUserDtoTest)))
                 .andExpect(status().isBadRequest());
     }
 }

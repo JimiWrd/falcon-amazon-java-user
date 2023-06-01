@@ -21,7 +21,6 @@ public class Address {
     private String addressLine3;
     private String city;
     private String postcode;
-    @Column(name = "is_business")
-    private boolean isBusiness;
+    private boolean business;
 
 }
