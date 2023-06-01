@@ -37,7 +37,7 @@ public class UserFixtures {
                 .emailAddress("josh.wood@me.com")
                 .telephone("0121123456")
                 .dateOfBirth(LocalDate.parse("1994-02-04"))
-                .passwordHash("test")
+                .password("test")
                 .build();
     }
 
@@ -58,7 +58,7 @@ public class UserFixtures {
                 .emailAddress("joe.bloggs@me.com")
                 .telephone("01211727272")
                 .dateOfBirth(LocalDate.parse("1994-02-04"))
-                .passwordHash("test1")
+                .password("test1")
                 .build();
     }
 }

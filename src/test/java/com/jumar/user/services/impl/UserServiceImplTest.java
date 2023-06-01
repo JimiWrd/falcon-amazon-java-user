@@ -91,7 +91,7 @@ class UserServiceImplTest {
     @Test
     void should_returnTrue_when_comparing_plaintextPassword_to_hashedPasswordProperty() {
         String plaintextPass = "plaintext";
-        createUserDto.setPasswordHash(plaintextPass);
+        createUserDto.setPassword(plaintextPass);
         User passwordTest = userService.createUser(createUserDto);
         assertThat(passwordTest).extracting("passwordHash").isNotEqualTo(plaintextPass);
     }
