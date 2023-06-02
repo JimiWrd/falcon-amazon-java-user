@@ -8,6 +8,7 @@ import com.jumar.user.fixtures.UserFixtures;
 import com.jumar.user.models.User;
 import com.jumar.user.repository.AddressRepository;
 import com.jumar.user.repository.UserRepository;
+import com.jumar.user.repository.UserTokenRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,11 +32,15 @@ class UserServiceImplTest {
     @Mock
     AddressRepository addressRepository;
 
+    @Mock
+    UserTokenRepository userTokenRepository;
+
     @InjectMocks
     private UserServiceImpl userService;
     private CreateUserDto createUserDto;
     private User testUser;
     private User createdUser;
+
 
     @BeforeEach
     void setup() {
@@ -85,7 +91,7 @@ class UserServiceImplTest {
     @Test
     void should_returnTrue_when_comparing_plaintextPassword_to_hashedPasswordProperty() {
         String plaintextPass = "plaintext";
-        createUserDto.setPasswordHash(plaintextPass);
+        createUserDto.setPassword(plaintextPass);
         User passwordTest = userService.createUser(createUserDto);
         assertThat(passwordTest).extracting("passwordHash").isNotEqualTo(plaintextPass);
     }
@@ -127,5 +133,21 @@ class UserServiceImplTest {
     @Test
     void should_throwException_when_deleteUserThatDoesNotExist() {
         assertThatThrownBy(() -> userService.deleteUser(1)).isInstanceOf(UserNotFoundException.class);
+    }
+
+    @Test
+    void should_return_string_when_deleteByUser() {
+
+        String expectedMessage = "User deleted";
+        Integer expectedTokenEntities = 1;
+        when(userRepository.findById(testUser.getId())).thenReturn(Optional.ofNullable(testUser));
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
+        when(userTokenRepository.deleteByUserId(testUser.getId())).thenReturn(expectedTokenEntities);
+
+        String actualMessage = userService.deleteUser(testUser.getId());
+
+        assertThat(actualMessage).isEqualTo(expectedMessage);
+
+
     }
 }

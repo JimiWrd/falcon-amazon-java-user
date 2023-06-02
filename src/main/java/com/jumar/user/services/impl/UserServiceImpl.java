@@ -10,8 +10,10 @@ import com.jumar.user.models.Address;
 import com.jumar.user.models.User;
 import com.jumar.user.repository.AddressRepository;
 import com.jumar.user.repository.UserRepository;
+import com.jumar.user.repository.UserTokenRepository;
 import com.jumar.user.services.UserService;
 import com.jumar.user.utils.PasswordUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.modelmapper.ModelMapper;
@@ -24,7 +26,7 @@ import java.time.LocalDateTime;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final AddressRepository addressRepository;
+    private final UserTokenRepository userTokenRepository;
 
     @SneakyThrows
     @Override
@@ -43,11 +45,11 @@ public class UserServiceImpl implements UserService {
                 .telephone(createUserDto.getTelephone())
                 .dateOfBirth(createUserDto.getDateOfBirth())
                 .username(createUserDto.getEmailAddress())
-                .passwordHash(PasswordUtils.hashPassword(createUserDto.getPasswordHash()))
+                .passwordHash(PasswordUtils.hashPassword(createUserDto.getPassword()))
                 .dateAdded(currentTime)
                 .dateLastModified(currentTime)
                 .failedLoginAttempts(0)
-                .isDeleted(false)
+                .deleted(false)
                 .build();
 
         userRepository.save(newUser);
@@ -59,7 +61,7 @@ public class UserServiceImpl implements UserService {
     public ReadUserDto getUser(int id) throws UserNotFoundException {
         ModelMapper mapper = new ModelMapper();
         User response = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User does not exist."));
-
+        validateIsDeleted(response);
         return mapper.map(response, ReadUserDto.class);
     }
 
@@ -67,7 +69,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(UpdateUserDto updateUserDto, int id) throws UserNotFoundException {
         User response = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User does not exist."));
-
+        validateIsDeleted(response);
         User updateUser = User.builder()
                 .id(response.getId())
                 .forenames(updateUserDto.getForenames())
@@ -76,11 +78,11 @@ public class UserServiceImpl implements UserService {
                 .telephone(updateUserDto.getTelephone())
                 .dateOfBirth(updateUserDto.getDateOfBirth())
                 .username(updateUserDto.getEmailAddress())
-                .passwordHash(PasswordUtils.hashPassword(updateUserDto.getPasswordHash()))
+                .passwordHash(PasswordUtils.hashPassword(updateUserDto.getPassword()))
                 .dateAdded(response.getDateAdded())
                 .dateLastModified(LocalDateTime.now())
                 .failedLoginAttempts(response.getFailedLoginAttempts())
-                .isDeleted(false)
+                .deleted(false)
                 .build();
 
         userRepository.save(updateUser);
@@ -89,12 +91,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public String deleteUser(int id) throws UserNotFoundException {
-        if(!userRepository.existsById(id)) {
-            throw new UserNotFoundException("User does not exist.");
-        }
+        User response = userRepository.findById(id).orElseThrow(
+                () -> new UserNotFoundException("User does not exist."));
 
-        userRepository.deleteById(id);
+        response.setDeleted(true);
+
+        userRepository.save(response);
+        userTokenRepository.deleteByUserId(response.getId());
 
         return "User deleted";
     }
@@ -104,5 +109,9 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
-
+    private void validateIsDeleted(User response) {
+        if (response.isDeleted()) {
+            throw new UserNotFoundException("User does not exist.");
+        }
+    }
 }

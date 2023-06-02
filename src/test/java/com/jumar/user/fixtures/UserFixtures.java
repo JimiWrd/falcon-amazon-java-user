@@ -18,14 +18,16 @@ public class UserFixtures {
                 .id(1)
                 .forenames("Josh").surname("Wood")
                 .emailAddress("josh.wood@me.com")
-                .telephone("0121123456").dateOfBirth(LocalDate.of(1994, 4, 2))
+                .telephone("0121123456")
+                .dateOfBirth(LocalDate.parse("1994-02-04"))
                 .username("josh.wood@me.com")
                 .passwordHash(PasswordUtils.hashPassword("test"))
                 .dateAdded(LocalDateTime.now())
                 .dateLastModified(LocalDateTime.now())
                 .failedLoginAttempts(0)
-                .isDeleted(false)
+                .deleted(false)
                 .build();
+
     }
 
     public static CreateUserDto generateCreateUserDto() {
@@ -34,8 +36,8 @@ public class UserFixtures {
                 .surname("Wood")
                 .emailAddress("josh.wood@me.com")
                 .telephone("0121123456")
-                .dateOfBirth(LocalDate.of(1994, 4, 2))
-                .passwordHash("test")
+                .dateOfBirth(LocalDate.parse("1994-02-04"))
+                .password("test")
                 .build();
     }
 
@@ -45,7 +47,7 @@ public class UserFixtures {
                 .surname("Wood")
                 .emailAddress("josh.wood@me.com")
                 .telephone("0121123456")
-                .dateOfBirth(LocalDate.of(1994, 4, 2))
+                .dateOfBirth(LocalDate.parse("1994-02-04"))
                 .build();
     }
 
@@ -55,8 +57,8 @@ public class UserFixtures {
                 .surname("Bloggs")
                 .emailAddress("joe.bloggs@me.com")
                 .telephone("01211727272")
-                .dateOfBirth(LocalDate.of(1994, 4, 3))
-                .passwordHash("test1")
+                .dateOfBirth(LocalDate.parse("1994-02-04"))
+                .password("test1")
                 .build();
     }
 }

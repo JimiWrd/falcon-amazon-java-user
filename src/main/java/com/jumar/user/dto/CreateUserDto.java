@@ -26,5 +26,5 @@ public class CreateUserDto {
     @NotNull
     private LocalDate dateOfBirth;
     @NotNull(message = "Password cannot be empty.")
-    private String passwordHash;
+    private String password;
 }

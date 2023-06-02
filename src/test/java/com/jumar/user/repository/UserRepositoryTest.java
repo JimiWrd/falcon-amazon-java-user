@@ -38,7 +38,7 @@ class UserRepositoryTest {
                 .dateAdded(LocalDateTime.of(2023, 5, 12, 0,0))
                 .dateLastModified(LocalDateTime.of(2023, 5, 12, 0,0))
                 .failedLoginAttempts(0)
-                .isDeleted(false)
+                .deleted(false)
                 .build();
         userRepository.save(testUser);
     }
