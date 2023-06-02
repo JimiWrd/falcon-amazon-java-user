@@ -15,6 +15,6 @@ public final class PasswordUtils {
 
         byte [] hashBytes = md.digest(password.getBytes(StandardCharsets.UTF_8));
 
-        return DatatypeConverter.printHexBinary(hashBytes).toUpperCase();
+        return DatatypeConverter.printHexBinary(hashBytes);
     }
 }
