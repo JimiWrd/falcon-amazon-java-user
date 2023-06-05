@@ -1,5 +1,6 @@
 package com.jumar.user.repository;
 
+import com.jumar.user.exceptions.UserNotFoundException;
 import com.jumar.user.models.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,13 @@ class UserRepositoryTest {
     void should_returnTrue_when_userExistsByUsername() {
         boolean expected = userRepository.existsByUsername("josh.wood@me.com");
         assertThat(expected).isTrue();
+    }
+
+    @Test
+    void should_returnUser_when_findByUsername() {
+        User expected = userRepository.findByUsername("josh.wood@me.com")
+                .orElseThrow(() -> new UserNotFoundException("No user found"));
+        assertThat(expected).isInstanceOf(User.class);
     }
 
 }

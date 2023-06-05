@@ -1,7 +1,7 @@
 package com.jumar.user.fixtures;
 
 import com.jumar.user.dto.CreateUserDto;
-import com.jumar.user.dto.ReadUserDto;
+import com.jumar.user.dto.UserDto;
 import com.jumar.user.dto.UpdateUserDto;
 import com.jumar.user.models.User;
 import com.jumar.user.utils.PasswordUtils;
@@ -38,16 +38,6 @@ public class UserFixtures {
                 .telephone("0121123456")
                 .dateOfBirth(LocalDate.parse("1994-02-04"))
                 .password("test")
-                .build();
-    }
-
-    public static ReadUserDto generateReadUserDto() {
-        return ReadUserDto.builder()
-                .forenames("Josh")
-                .surname("Wood")
-                .emailAddress("josh.wood@me.com")
-                .telephone("0121123456")
-                .dateOfBirth(LocalDate.parse("1994-02-04"))
                 .build();
     }
 

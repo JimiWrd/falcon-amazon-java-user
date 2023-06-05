@@ -17,12 +17,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -60,15 +60,15 @@ class UserApplicationTests {
 
 	@SneakyThrows
 	@Test
-	void should_returnCorrectString_when_createUser() {
-		MvcResult result = mockMvc.perform(post("/api/user/create")
+	void should_returnCorrectResponseDTO_when_createUser() {
+		mockMvc.perform(post("/api/user/create")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(testCreateUserDto)))
+				.andExpect(jsonPath("$.success").exists())
+				.andExpect(jsonPath("$.success").isBoolean())
+				.andExpect(jsonPath("$.response").exists())
+				.andExpect(jsonPath("$.message").isEmpty())
 				.andReturn();
-
-		String resultMessage = result.getResponse().getContentAsString();
-
-		assertThat(resultMessage).isEqualTo("User created successfully.");
 	}
 
 	@SneakyThrows
@@ -98,7 +98,7 @@ class UserApplicationTests {
 		mockMvc.perform(put("/api/user/1")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(testUpdateUserDto)))
-				.andExpect(status().isCreated());
+				.andExpect(status().isOk());
 
 		User updatedUser = userRepository.findById(1).orElseThrow();
 

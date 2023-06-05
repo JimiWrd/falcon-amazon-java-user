@@ -2,6 +2,7 @@ package com.jumar.user.services.impl;
 
 import com.jumar.user.dto.CreateUserDto;
 import com.jumar.user.dto.UpdateUserDto;
+import com.jumar.user.dto.UserDto;
 import com.jumar.user.exceptions.UserNotFoundException;
 import com.jumar.user.exceptions.UsernameAlreadyExistsException;
 import com.jumar.user.fixtures.UserFixtures;
@@ -29,8 +30,6 @@ class UserServiceImplTest {
 
     @Mock
     UserRepository userRepository;
-    @Mock
-    AddressRepository addressRepository;
 
     @Mock
     UserTokenRepository userTokenRepository;
@@ -46,6 +45,7 @@ class UserServiceImplTest {
     void setup() {
         createUserDto = UserFixtures.generateCreateUserDto();
         testUser = UserFixtures.generateValidUser();
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
         createdUser = userService.createUser(createUserDto);
     }
 
@@ -138,16 +138,13 @@ class UserServiceImplTest {
     @Test
     void should_return_string_when_deleteByUser() {
 
-        String expectedMessage = "User deleted";
+
         Integer expectedTokenEntities = 1;
         when(userRepository.findById(testUser.getId())).thenReturn(Optional.ofNullable(testUser));
-        when(userRepository.save(any(User.class))).thenReturn(testUser);
         when(userTokenRepository.deleteByUserId(testUser.getId())).thenReturn(expectedTokenEntities);
 
-        String actualMessage = userService.deleteUser(testUser.getId());
+        UserDto deletedUserDto = userService.deleteUser(testUser.getId());
 
-        assertThat(actualMessage).isEqualTo(expectedMessage);
-
-
+        assertThat(deletedUserDto).isInstanceOf(UserDto.class);
     }
 }
