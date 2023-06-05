@@ -3,8 +3,11 @@ package com.jumar.user.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jumar.user.dto.CreateUserDto;
 import com.jumar.user.fixtures.UserFixtures;
+import com.jumar.user.models.User;
+import com.jumar.user.repository.UserRepository;
 import com.jumar.user.services.UserService;
 import lombok.SneakyThrows;
+import org.hibernate.mapping.Any;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,6 +46,9 @@ class UserControllerTest {
     @SneakyThrows
     @Test
     void should_returnCreated_when_callingCreateUserEndpoint() {
+        User newUser = UserFixtures.generateValidUser();
+        when(userService.createUser(any(CreateUserDto.class))).thenReturn(newUser);
+
         mockMvc.perform(post("/api/user/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createUserDtoTest)))

@@ -2,13 +2,13 @@ package com.jumar.user.services.impl;
 
 import com.jumar.user.dto.AddAddressDto;
 import com.jumar.user.dto.CreateUserDto;
-import com.jumar.user.dto.ReadUserDto;
 import com.jumar.user.dto.UpdateUserDto;
+import com.jumar.user.dto.UserDto;
+import com.jumar.user.exceptions.UserCreateFailedException;
 import com.jumar.user.exceptions.UserNotFoundException;
 import com.jumar.user.exceptions.UsernameAlreadyExistsException;
 import com.jumar.user.models.Address;
 import com.jumar.user.models.User;
-import com.jumar.user.repository.AddressRepository;
 import com.jumar.user.repository.UserRepository;
 import com.jumar.user.repository.UserTokenRepository;
 import com.jumar.user.services.UserService;
@@ -20,6 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -31,7 +32,11 @@ public class UserServiceImpl implements UserService {
     @SneakyThrows
     @Override
     public User createUser(CreateUserDto createUserDto) {
-
+        Optional<User> response = userRepository.findByUsername(
+                createUserDto.getEmailAddress());
+        if (response.isPresent() && response.get().isDeleted()) {
+            throw new UserCreateFailedException("Issue with user creation please contact support via Email");
+        }
         if(userRepository.existsByUsername(createUserDto.getEmailAddress())) {
             throw new UsernameAlreadyExistsException("This username already exists");
         }
@@ -52,17 +57,18 @@ public class UserServiceImpl implements UserService {
                 .deleted(false)
                 .build();
 
-        userRepository.save(newUser);
+        Integer generatedId = userRepository.save(newUser).getId();
+        newUser.setId(generatedId);
 
         return newUser;
     }
 
     @Override
-    public ReadUserDto getUser(int id) throws UserNotFoundException {
+    public UserDto getUser(int id) throws UserNotFoundException {
         ModelMapper mapper = new ModelMapper();
         User response = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User does not exist."));
         validateIsDeleted(response);
-        return mapper.map(response, ReadUserDto.class);
+        return mapper.map(response, UserDto.class);
     }
 
     @SneakyThrows
@@ -92,7 +98,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public String deleteUser(int id) throws UserNotFoundException {
+    public UserDto deleteUser(int id) throws UserNotFoundException {
         User response = userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("User does not exist."));
 
@@ -101,12 +107,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(response);
         userTokenRepository.deleteByUserId(response.getId());
 
-        return "User deleted";
-    }
-
-    @Override
-    public Address addAddress(AddAddressDto addAddressDto, int id) {
-        return null;
+        return UserDto.builder().userId(response.getId()).build();
     }
 
     private void validateIsDeleted(User response) {

@@ -1,11 +1,14 @@
 package com.jumar.user.exceptions;
 
-import lombok.Builder;
+import com.jumar.user.dto.ResponseBodyDto;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDateTime;
 
@@ -13,33 +16,48 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserCreateFailedException.class)
-    public ResponseEntity<ErrorObject> handleUserCreateFailedException(UserCreateFailedException ex) {
-        ErrorObject error = ErrorObject.builder()
+    public ResponseEntity<ResponseBodyDto> handleUserCreateFailedException(UserCreateFailedException ex) {
+        return new ResponseEntity<>(ResponseBodyDto.builder()
+                .success(false)
                 .message(ex.getMessage())
                 .timestamp(LocalDateTime.now())
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .build();
-        return ResponseEntity.badRequest().body(error);
+                .build(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorObject> handleUserNotFoundException(UserNotFoundException ex) {
-        ErrorObject error = ErrorObject.builder()
+    public ResponseEntity<ResponseBodyDto> handleUserNotFoundException(UserNotFoundException ex) {
+        return new ResponseEntity<>(ResponseBodyDto.builder()
+                .success(false)
                 .message(ex.getMessage())
                 .timestamp(LocalDateTime.now())
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .build();
-        return ResponseEntity.badRequest().body(error);
+                .build(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UsernameAlreadyExistsException.class)
-    public ResponseEntity<ErrorObject> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
-        ErrorObject error = ErrorObject.builder()
+    public ResponseEntity<ResponseBodyDto> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
+        return new ResponseEntity<>(ResponseBodyDto.builder()
+                .success(false)
                 .message(ex.getMessage())
                 .timestamp(LocalDateTime.now())
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .build();
-        return ResponseEntity.badRequest().body(error);
+                .build(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ResponseBodyDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        return new ResponseEntity<>(ResponseBodyDto.builder()
+                .success(false)
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ResponseBodyDto> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        return new ResponseEntity<>(ResponseBodyDto.builder()
+                .success(false)
+                .message("ERROR: Email Addresses and Phone numbers must be unique.\n" + ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build(), HttpStatus.BAD_REQUEST);
     }
 
 }
